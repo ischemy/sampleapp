@@ -72,4 +72,4 @@ jobs:
 
       # Langkah 2: Jalankan script k6 Anda
       - name: Run k6 load test
-        run: k6 run loadtest/script.js
+        run: k6 run script.js
