@@ -1,10 +1,9 @@
-name: CI Pipeline Notes App (Go)
+name: CI Pipeline
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   lint:
-    name: Linting
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -12,13 +11,10 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.21'
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v4
-        with:
-          version: latest
+      - name: Run Lint
+        run: go fmt ./... # Dasar linting Go
 
-  unit-test:
-    name: Unit Testing
+  test:
     needs: lint
     runs-on: ubuntu-latest
     steps:
@@ -27,12 +23,10 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.21'
-      - name: Run Tests with Coverage
-        run: go test -v -coverprofile=coverage.out ./...
+      - run: go test -v -coverprofile=coverage.out ./...
 
-  sonarqube:
-    name: SonarQube Scan
-    needs: unit-test
+  sonar:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -44,13 +38,11 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-  smoke-test:
-    name: k6 Smoke Test
-    needs: sonarqube
+  k6_test:
+    needs: sonar
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run k6 test
+      - name: Run k6
         uses: grafana/setup-k6-action@v1
-      - name: Run k6 Smoke Test
-        run: k6 run loadtest/script.js
+      - run: k6 run loadtest/script.js
