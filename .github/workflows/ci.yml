@@ -37,6 +37,12 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.organization=ischemy
+            -Dsonar.projectKey=sampleapp
+            -Dsonar.sources=.
+            -Dsonar.go.coverage.reportPaths=coverage.out
 
   k6_test:
     needs: sonar
