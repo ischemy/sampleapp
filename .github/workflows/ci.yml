@@ -61,7 +61,15 @@ jobs:
     needs: sonar
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Run k6
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Langkah 1: Setup k6 dengan versi spesifik agar lebih stabil
+      - name: Setup k6
         uses: grafana/setup-k6-action@v1
-      - run: k6 run loadtest/script.js
+        with:
+          k6-version: '0.49.0' # Gunakan versi stabil yang tersedia
+
+      # Langkah 2: Jalankan script k6 Anda
+      - name: Run k6 load test
+        run: k6 run loadtest/script.js
